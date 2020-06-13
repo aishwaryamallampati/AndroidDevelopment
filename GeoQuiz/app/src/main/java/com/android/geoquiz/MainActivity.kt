@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import com.android.geoquiz.model.Question
@@ -14,8 +15,8 @@ class MainActivity : AppCompatActivity() {
     // Using lateinit, we are informing compiler that these buttons will be assigned to non-null values later
     private lateinit var btnTrue: Button
     private lateinit var btnFalse: Button
-    private lateinit var btnNext: Button
-    private lateinit var btnPrev: Button
+    private lateinit var btnNext: ImageButton
+    private lateinit var btnPrev: ImageButton
     private lateinit var tvQuestion: TextView
 
     // Questions to be posed to the user
