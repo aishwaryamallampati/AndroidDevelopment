@@ -2,6 +2,7 @@ package com.android.geoquiz
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
@@ -12,6 +13,11 @@ import com.android.geoquiz.model.Question
 import com.android.geoquiz.utils.Constants
 
 class MainActivity : AppCompatActivity() {
+    // Tag to log messages
+    companion object{
+        private const val TAG = "MainActivity"
+    }
+
     // Using lateinit, we are informing compiler that these buttons will be assigned to non-null values later
     private lateinit var btnTrue: Button
     private lateinit var btnFalse: Button
@@ -21,19 +27,22 @@ class MainActivity : AppCompatActivity() {
 
     // Questions to be posed to the user
     private val questionBank = listOf(
-        Question(R.string.question_australia, true),
-        Question(R.string.question_oceans, true),
-        Question(R.string.question_mideast, false),
-        Question(R.string.question_africa, false),
-        Question(R.string.question_americas, true),
-        Question(R.string.question_asia, true)
+        Question(R.string.question_australia, true, false),
+        Question(R.string.question_oceans, true, false),
+        Question(R.string.question_mideast, false, false),
+        Question(R.string.question_africa, false, false),
+        Question(R.string.question_americas, true, false),
+        Question(R.string.question_asia, true, false)
     )
 
     // Index to keep track of question displayed to the user
     private var currentIndex = 0
+    private var questionsAnswered = 0
+    private var questionsAnsweredCorrectly = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate(Bundle?) called")
         setContentView(R.layout.activity_main)
 
         // Assign all view to respective variables
@@ -48,9 +57,11 @@ class MainActivity : AppCompatActivity() {
 
         // Logic for each button
         btnTrue.setOnClickListener{view:View->
+            markQuestionAsAnswered()
             checkAnswer(true)
         }
         btnFalse.setOnClickListener{view:View->
+            markQuestionAsAnswered()
             checkAnswer(false)
         }
         btnNext.setOnClickListener{View->
@@ -70,16 +81,44 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Overriding activity life cycle methods
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart() called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume() called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause() called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop() called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy() called")
+    }
+
     private fun updateQuestion(){
         // Display question text
         val questionTextResId = questionBank[currentIndex].textResId
         tvQuestion.setText(questionTextResId)
+        updateAnswerButtons()
     }
 
     private fun checkAnswer(userAnswer: Boolean){
         val correctAnswer = questionBank[currentIndex].answer
 
         val messageResId = if(userAnswer == correctAnswer){
+            questionsAnsweredCorrectly += 1
             R.string.toast_correct
         } else{
             R.string.toast_incorrect
@@ -89,5 +128,35 @@ class MainActivity : AppCompatActivity() {
         var toast = Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
         toast.setGravity(Gravity.TOP, Constants.TOAST_XOFFSET, Constants.TOAST_YOFFSET)
         toast.show()
+
+        areAllQuestionsAnswered()
     }
+
+    // User is allowed to enter answer to each question exactly once
+    private fun updateAnswerButtons(){
+        if(questionBank[currentIndex].userAnswered){
+            btnTrue.isEnabled = false
+            btnFalse.isEnabled = false
+        } else{
+            btnTrue.isEnabled = true
+            btnFalse.isEnabled = true
+        }
+    }
+
+    // Once user submits answer to a question, mark it as answered and update answer buttons
+    private fun markQuestionAsAnswered(){
+        questionsAnswered += 1
+        questionBank[currentIndex].userAnswered = true
+        updateAnswerButtons()
+    }
+
+    // If user answered all the questions, then display a score
+    private fun areAllQuestionsAnswered(){
+        if(questionsAnswered == questionBank.size){
+            val score = ((questionsAnsweredCorrectly.toDouble()/questionsAnswered)*100).toInt()
+            val message = getString(R.string.score, score)
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
 }
