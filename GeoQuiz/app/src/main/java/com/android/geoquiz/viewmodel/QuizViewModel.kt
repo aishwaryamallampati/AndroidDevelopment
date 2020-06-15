@@ -20,7 +20,7 @@ class QuizViewModel : ViewModel() {
     )
 
     // Index to keep track of question displayed to the user
-    private var currentIndex = 0
+    var currentIndex = 0
     private var questionsAnswered = 0
     private var questionsAnsweredCorrectly = 0
 

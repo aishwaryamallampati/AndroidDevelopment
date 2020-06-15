@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     // Tag to log messages
     companion object {
         private const val TAG = "MainActivity"
+        private const val KEY_INDEX = "index"
     }
 
     // Using lateinit, we are informing compiler that these buttons will be assigned to non-null values later
@@ -36,6 +37,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
         setContentView(R.layout.activity_main)
+
+        // check if current index is saved in the bundle
+        // If user used the app before, then app starts displaying the question from where he left the app
+        val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+        Log.i("bug", "currentIndex:" + currentIndex)
+        quizViewModel.currentIndex = currentIndex
 
         // Assign all view to respective variables
         btnTrue = findViewById(R.id.btn_true)
@@ -115,6 +122,12 @@ class MainActivity : AppCompatActivity() {
         val score = quizViewModel.calculateQuizScore()
         val message = getString(R.string.score, score)
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        Log.i(TAG, "onSaveInstanceState")
+        savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
     // Overriding activity life cycle methods
