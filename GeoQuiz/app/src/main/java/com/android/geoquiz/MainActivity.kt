@@ -9,12 +9,13 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import com.android.geoquiz.model.Question
+import androidx.lifecycle.ViewModelProviders
 import com.android.geoquiz.utils.Constants
+import com.android.geoquiz.viewmodel.QuizViewModel
 
 class MainActivity : AppCompatActivity() {
     // Tag to log messages
-    companion object{
+    companion object {
         private const val TAG = "MainActivity"
     }
 
@@ -25,20 +26,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnPrev: ImageButton
     private lateinit var tvQuestion: TextView
 
-    // Questions to be posed to the user
-    private val questionBank = listOf(
-        Question(R.string.question_australia, true, false),
-        Question(R.string.question_oceans, true, false),
-        Question(R.string.question_mideast, false, false),
-        Question(R.string.question_africa, false, false),
-        Question(R.string.question_americas, true, false),
-        Question(R.string.question_asia, true, false)
-    )
-
-    // Index to keep track of question displayed to the user
-    private var currentIndex = 0
-    private var questionsAnswered = 0
-    private var questionsAnsweredCorrectly = 0
+    // Using by lazy makes the quizViewModel a val instead of a var
+    // In this way, quizViewModel is assigned a value only one time
+    private val quizViewModel: QuizViewModel by lazy {
+        ViewModelProviders.of(this).get(QuizViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,29 +48,73 @@ class MainActivity : AppCompatActivity() {
         updateQuestion()
 
         // Logic for each button
-        btnTrue.setOnClickListener{view:View->
-            markQuestionAsAnswered()
+        btnTrue.setOnClickListener { view: View ->
+            quizViewModel.markQuestionAsAnswered()
+            updateAnswerButtons()
             checkAnswer(true)
         }
-        btnFalse.setOnClickListener{view:View->
-            markQuestionAsAnswered()
+        btnFalse.setOnClickListener { view: View ->
+            quizViewModel.markQuestionAsAnswered()
+            updateAnswerButtons()
             checkAnswer(false)
         }
-        btnNext.setOnClickListener{View->
-            currentIndex = (currentIndex + 1) % questionBank.size
+        btnNext.setOnClickListener { View ->
+            quizViewModel.moveToNext()
             updateQuestion()
         }
-        btnPrev.setOnClickListener{View->
-            if(currentIndex == 0){
-                currentIndex = questionBank.size
-            }
-            currentIndex = (currentIndex - 1) % questionBank.size
+        btnPrev.setOnClickListener { View ->
+            quizViewModel.moveToPrev()
             updateQuestion()
         }
-        tvQuestion.setOnClickListener{View->
-            currentIndex = (currentIndex + 1) % questionBank.size
+        tvQuestion.setOnClickListener { View ->
+            quizViewModel.moveToNext()
             updateQuestion()
         }
+    }
+
+    private fun updateQuestion() {
+        // Display question text
+        val questionTextResId = quizViewModel.currentQuestionText
+        tvQuestion.setText(questionTextResId)
+        updateAnswerButtons()
+    }
+
+    // User is allowed to enter answer to each question exactly once
+    private fun updateAnswerButtons() {
+        if (quizViewModel.isCurrentQuestionAnswered) {
+            btnTrue.isEnabled = false
+            btnFalse.isEnabled = false
+        } else {
+            btnTrue.isEnabled = true
+            btnFalse.isEnabled = true
+        }
+    }
+
+    private fun checkAnswer(userAnswer: Boolean) {
+        val correctAnswer = quizViewModel.currentQuestionAnswer
+
+        val messageResId = if (userAnswer == correctAnswer) {
+            quizViewModel.incrementCorrectAnswerCount()
+            R.string.toast_correct
+        } else {
+            R.string.toast_incorrect
+        }
+
+        // Display toast message based on user click
+        var toast = Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.TOP, Constants.TOAST_XOFFSET, Constants.TOAST_YOFFSET)
+        toast.show()
+
+        if (quizViewModel.areAllQuestionsAnswered()) {
+            displayScore()
+        }
+    }
+
+    // Displays quiz score as percentage
+    private fun displayScore() {
+        val score = quizViewModel.calculateQuizScore()
+        val message = getString(R.string.score, score)
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     // Overriding activity life cycle methods
@@ -106,57 +142,4 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d(TAG, "onDestroy() called")
     }
-
-    private fun updateQuestion(){
-        // Display question text
-        val questionTextResId = questionBank[currentIndex].textResId
-        tvQuestion.setText(questionTextResId)
-        updateAnswerButtons()
-    }
-
-    private fun checkAnswer(userAnswer: Boolean){
-        val correctAnswer = questionBank[currentIndex].answer
-
-        val messageResId = if(userAnswer == correctAnswer){
-            questionsAnsweredCorrectly += 1
-            R.string.toast_correct
-        } else{
-            R.string.toast_incorrect
-        }
-
-        // Display toast message based on user click
-        var toast = Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
-        toast.setGravity(Gravity.TOP, Constants.TOAST_XOFFSET, Constants.TOAST_YOFFSET)
-        toast.show()
-
-        areAllQuestionsAnswered()
-    }
-
-    // User is allowed to enter answer to each question exactly once
-    private fun updateAnswerButtons(){
-        if(questionBank[currentIndex].userAnswered){
-            btnTrue.isEnabled = false
-            btnFalse.isEnabled = false
-        } else{
-            btnTrue.isEnabled = true
-            btnFalse.isEnabled = true
-        }
-    }
-
-    // Once user submits answer to a question, mark it as answered and update answer buttons
-    private fun markQuestionAsAnswered(){
-        questionsAnswered += 1
-        questionBank[currentIndex].userAnswered = true
-        updateAnswerButtons()
-    }
-
-    // If user answered all the questions, then display a score
-    private fun areAllQuestionsAnswered(){
-        if(questionsAnswered == questionBank.size){
-            val score = ((questionsAnsweredCorrectly.toDouble()/questionsAnswered)*100).toInt()
-            val message = getString(R.string.score, score)
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-        }
-    }
-
 }
