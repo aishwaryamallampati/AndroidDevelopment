@@ -7,3 +7,6 @@ Details of GeoQuiz Android Application:
 - Prev and Next buttons can be used to navigate through the questions in the quiz
 - Next question can also be displayed by tapping on the question text
 - Quiz Score will be displayed to the user after answering all the questions.
+
+Programming Language: Kotlin
+Architecture: MVC
