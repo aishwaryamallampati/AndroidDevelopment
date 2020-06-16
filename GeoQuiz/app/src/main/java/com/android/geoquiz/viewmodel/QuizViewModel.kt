@@ -23,6 +23,7 @@ class QuizViewModel : ViewModel() {
     var currentIndex = 0
     private var questionsAnswered = 0
     private var questionsAnsweredCorrectly = 0
+    var cheatCount = 0
 
     val currentQuestionText: Int
         get() = questionBank[currentIndex].textResId
@@ -59,6 +60,7 @@ class QuizViewModel : ViewModel() {
     fun markQuestionAsCheated(userCheated: Boolean) {
         Log.i(TAG, "markQuestionAsCheated()")
         questionBank[currentIndex].userCheated = userCheated
+        cheatCount += 1
     }
 
     fun incrementCorrectAnswerCount() {

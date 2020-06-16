@@ -27,6 +27,7 @@ class CheatActivity : AppCompatActivity() {
 
     private lateinit var tvAnswer: TextView
     private lateinit var btnShowAnswer: Button
+    private lateinit var tvApiLevel: TextView
 
     private var answerIsTrue = false
 
@@ -38,6 +39,8 @@ class CheatActivity : AppCompatActivity() {
         answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
         tvAnswer = findViewById(R.id.tv_answer)
         btnShowAnswer = findViewById(R.id.btn_show_answer)
+        tvApiLevel = findViewById(R.id.tv_apiLevel)
+        tvApiLevel.setText(String.format(getString(R.string.api_level), android.os.Build.VERSION.SDK_INT))
 
         btnShowAnswer.setOnClickListener {
             val textAnswer = when {

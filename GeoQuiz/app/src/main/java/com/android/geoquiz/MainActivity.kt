@@ -1,7 +1,9 @@
 package com.android.geoquiz
 
 import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -73,7 +75,14 @@ class MainActivity : AppCompatActivity() {
             // start cheat activity
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            // use higher apis by wraping them in if else block
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val options =
+                    ActivityOptions.makeClipRevealAnimation(View, 0, 0, View.width, View.height)
+                startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
+            } else {
+                startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            }
         }
         btnNext.setOnClickListener { View ->
             quizViewModel.moveToNext()
@@ -95,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         val questionTextResId = quizViewModel.currentQuestionText
         tvQuestion.setText(questionTextResId)
         updateAnswerButtons()
+        updateCheatButton()
     }
 
     // User is allowed to enter answer to each question exactly once
@@ -107,6 +117,12 @@ class MainActivity : AppCompatActivity() {
             btnTrue.isEnabled = true
             btnFalse.isEnabled = true
         }
+
+    }
+
+    // Disable cheat button if user cheated for more than MAX_CHEAT_COUNT times
+    private fun updateCheatButton() {
+        btnCheat.isEnabled = quizViewModel.cheatCount < Constants.MAX_CHEAT_COUNT
     }
 
     private fun checkAnswer(userAnswer: Boolean) {

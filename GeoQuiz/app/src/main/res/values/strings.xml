@@ -17,4 +17,5 @@
     <string name="btn_show_answer">Show Answer</string>
     <string name="btn_cheat">Cheat!</string>
     <string name="toast_judgement">Cheating is wrong.</string>
+    <string name="api_level">API LEVEL %d</string>
 </resources>
