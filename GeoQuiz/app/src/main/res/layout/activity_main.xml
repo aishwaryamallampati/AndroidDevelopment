@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity = "center"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -12,8 +12,8 @@
         android:id="@+id/tv_question"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/question_australia"
         android:padding="@dimen/tv_padding"
+        android:text="@string/question_australia"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -23,21 +23,28 @@
         android:id="@+id/btn_true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btn_true"
         android:layout_margin="@dimen/btn_margin"
-        app:layout_constraintTop_toBottomOf="@id/tv_question"
-        app:layout_constraintRight_toRightOf="@id/glv_center">
-    </Button>
+        android:text="@string/btn_true"
+        app:layout_constraintRight_toRightOf="@id/glv_center"
+        app:layout_constraintTop_toBottomOf="@id/tv_question"></Button>
 
     <Button
         android:id="@+id/btn_false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btn_false"
         android:layout_margin="@dimen/btn_margin"
-        app:layout_constraintTop_toBottomOf="@id/tv_question"
-        app:layout_constraintLeft_toRightOf="@id/glv_center">
-    </Button>
+        android:text="@string/btn_false"
+        app:layout_constraintLeft_toRightOf="@id/glv_center"
+        app:layout_constraintTop_toBottomOf="@id/tv_question"></Button>
+
+    <Button
+        android:id="@+id/btn_cheat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_cheat"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_true"></Button>
 
     <ImageButton
         android:id="@+id/btn_next"
@@ -45,9 +52,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/btn_margin"
         android:src="@drawable/arrow_right"
-        app:layout_constraintTop_toBottomOf="@id/btn_true"
-        app:layout_constraintLeft_toRightOf="@id/glv_center">
-    </ImageButton>
+        app:layout_constraintLeft_toRightOf="@id/glv_center"
+        app:layout_constraintTop_toBottomOf="@id/btn_cheat"></ImageButton>
 
     <ImageButton
         android:id="@+id/btn_prev"
@@ -55,15 +61,14 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/btn_margin"
         android:src="@drawable/arrow_left"
-        app:layout_constraintTop_toBottomOf="@id/btn_true"
-        app:layout_constraintRight_toRightOf="@id/glv_center">
-    </ImageButton>
+        app:layout_constraintRight_toRightOf="@id/glv_center"
+        app:layout_constraintTop_toBottomOf="@id/btn_cheat"></ImageButton>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/glv_center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"/>
+        app:layout_constraintGuide_percent="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

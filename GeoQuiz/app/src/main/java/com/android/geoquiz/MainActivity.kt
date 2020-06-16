@@ -1,5 +1,7 @@
 package com.android.geoquiz
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -18,11 +20,13 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val KEY_INDEX = "index"
+        private const val REQUEST_CODE_CHEAT = 0
     }
 
     // Using lateinit, we are informing compiler that these buttons will be assigned to non-null values later
     private lateinit var btnTrue: Button
     private lateinit var btnFalse: Button
+    private lateinit var btnCheat: Button
     private lateinit var btnNext: ImageButton
     private lateinit var btnPrev: ImageButton
     private lateinit var tvQuestion: TextView
@@ -41,12 +45,12 @@ class MainActivity : AppCompatActivity() {
         // check if current index is saved in the bundle
         // If user used the app before, then app starts displaying the question from where he left the app
         val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
-        Log.i("bug", "currentIndex:" + currentIndex)
         quizViewModel.currentIndex = currentIndex
 
         // Assign all view to respective variables
         btnTrue = findViewById(R.id.btn_true)
         btnFalse = findViewById(R.id.btn_false)
+        btnCheat = findViewById(R.id.btn_cheat)
         btnNext = findViewById(R.id.btn_next)
         btnPrev = findViewById(R.id.btn_prev)
         tvQuestion = findViewById(R.id.tv_question)
@@ -65,6 +69,12 @@ class MainActivity : AppCompatActivity() {
             updateAnswerButtons()
             checkAnswer(false)
         }
+        btnCheat.setOnClickListener { View ->
+            // start cheat activity
+            val answerIsTrue = quizViewModel.currentQuestionAnswer
+            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+        }
         btnNext.setOnClickListener { View ->
             quizViewModel.moveToNext()
             updateQuestion()
@@ -80,6 +90,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
+        Log.i(TAG, "updateQuestion() called")
         // Display question text
         val questionTextResId = quizViewModel.currentQuestionText
         tvQuestion.setText(questionTextResId)
@@ -88,6 +99,7 @@ class MainActivity : AppCompatActivity() {
 
     // User is allowed to enter answer to each question exactly once
     private fun updateAnswerButtons() {
+        Log.i(TAG, "updateAnswerButtons() called")
         if (quizViewModel.isCurrentQuestionAnswered) {
             btnTrue.isEnabled = false
             btnFalse.isEnabled = false
@@ -98,13 +110,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
+        Log.i(TAG, "checkAnswer() called")
         val correctAnswer = quizViewModel.currentQuestionAnswer
 
-        val messageResId = if (userAnswer == correctAnswer) {
-            quizViewModel.incrementCorrectAnswerCount()
-            R.string.toast_correct
-        } else {
-            R.string.toast_incorrect
+        val messageResId = when {
+            quizViewModel.isCurrentQuestionCheated -> R.string.toast_judgement
+            userAnswer == correctAnswer -> {
+                quizViewModel.incrementCorrectAnswerCount()
+                R.string.toast_correct
+            }
+            else -> R.string.toast_incorrect
         }
 
         // Display toast message based on user click
@@ -119,6 +134,7 @@ class MainActivity : AppCompatActivity() {
 
     // Displays quiz score as percentage
     private fun displayScore() {
+        Log.i(TAG, "displayScore() called")
         val score = quizViewModel.calculateQuizScore()
         val message = getString(R.string.score, score)
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -128,6 +144,19 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(savedInstanceState)
         Log.i(TAG, "onSaveInstanceState")
         savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.i(TAG, "onActivityResult resultCode:" + resultCode + " requestCode:" + requestCode)
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            val userCheated = data?.getBooleanExtra(Constants.EXTRA_ANSWER_SHOWN, false) ?: false
+            quizViewModel.markQuestionAsCheated(userCheated)
+        }
     }
 
     // Overriding activity life cycle methods

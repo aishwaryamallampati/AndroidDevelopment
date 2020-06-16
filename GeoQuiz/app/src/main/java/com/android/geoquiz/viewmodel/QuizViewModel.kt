@@ -11,12 +11,12 @@ class QuizViewModel : ViewModel() {
 
     // Questions to be posed to the user
     private val questionBank = listOf(
-        Question(R.string.question_australia, true, false),
-        Question(R.string.question_oceans, true, false),
-        Question(R.string.question_mideast, false, false),
-        Question(R.string.question_africa, false, false),
-        Question(R.string.question_americas, true, false),
-        Question(R.string.question_asia, true, false)
+        Question(R.string.question_australia, true, false, false),
+        Question(R.string.question_oceans, true, false, false),
+        Question(R.string.question_mideast, false, false, false),
+        Question(R.string.question_africa, false, false, false),
+        Question(R.string.question_americas, true, false, false),
+        Question(R.string.question_asia, true, false, false)
     )
 
     // Index to keep track of question displayed to the user
@@ -33,11 +33,16 @@ class QuizViewModel : ViewModel() {
     val isCurrentQuestionAnswered: Boolean
         get() = questionBank[currentIndex].userAnswered
 
+    val isCurrentQuestionCheated: Boolean
+        get() = questionBank[currentIndex].userCheated
+
     fun moveToNext() {
+        Log.i(TAG, "moveToNext()")
         currentIndex = (currentIndex + 1) % questionBank.size
     }
 
     fun moveToPrev() {
+        Log.i(TAG, "moveToPrev()")
         if (currentIndex == 0) {
             currentIndex = questionBank.size
         }
@@ -46,15 +51,23 @@ class QuizViewModel : ViewModel() {
 
     // Once user submits answer to a question, mark it as answered and update answer buttons
     fun markQuestionAsAnswered() {
+        Log.i(TAG, "markQuestionAsAnswered()")
         questionsAnswered += 1
         questionBank[currentIndex].userAnswered = true
     }
 
+    fun markQuestionAsCheated(userCheated: Boolean) {
+        Log.i(TAG, "markQuestionAsCheated()")
+        questionBank[currentIndex].userCheated = userCheated
+    }
+
     fun incrementCorrectAnswerCount() {
+        Log.i(TAG, "incrementCorrectAnswerCount()")
         questionsAnsweredCorrectly += 1
     }
 
     fun areAllQuestionsAnswered(): Boolean {
+        Log.i(TAG, "areAllQuestionsAnswered()")
         if (questionsAnswered == questionBank.size) {
             return true
         }
@@ -63,6 +76,7 @@ class QuizViewModel : ViewModel() {
 
     // Quiz score is computed as a percentage
     fun calculateQuizScore(): Int {
+        Log.i(TAG, "calculateQuizScore()")
         return ((questionsAnsweredCorrectly.toDouble() / questionsAnswered) * 100).toInt()
     }
 
