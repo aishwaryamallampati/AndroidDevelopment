@@ -12,6 +12,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.android.criminalintent.model.Crime
+import com.android.criminalintent.utils.Utils
 
 class CrimeFragment : Fragment() {
     companion object {
@@ -41,7 +42,7 @@ class CrimeFragment : Fragment() {
         cbCrimeSolved = view.findViewById(R.id.cb_crime_solved)
 
         btnDate.apply {
-            text = crime.date.toString()
+            text = Utils.formatDate(crime.date)
             isEnabled = false
         }
         return view
