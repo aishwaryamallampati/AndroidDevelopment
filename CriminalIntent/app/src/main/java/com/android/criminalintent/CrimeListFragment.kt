@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,11 +32,13 @@ class CrimeListFragment : Fragment() {
     }
 
     private lateinit var rvCrime: RecyclerView
-    private var adapter: CrimeAdapter? = null
+
+    // Fragment takes time to load data from database so initialize recycler view to empty list
+    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i(TAG, "Total crimes : ${crimeListViewModel.crimes.size}")
+        //Log.i(TAG, "Total crimes : ${crimeListViewModel.crimes.size}")
     }
 
     override fun onCreateView(
@@ -46,8 +49,21 @@ class CrimeListFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_crime_list, container, false)
         rvCrime = view.findViewById(R.id.rv_crime)
         rvCrime.layoutManager = LinearLayoutManager(context)
-        updateUI()
+        rvCrime.adapter = adapter
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        crimeListViewModel.crimesListLiveData.observe(
+            viewLifecycleOwner,
+            Observer { crimes ->
+                crimes?.let {
+                    Log.i(TAG, "Got crimes ${crimes.size}")
+                    updateUI(crimes)
+                }
+            }
+        )
     }
 
     private inner class CrimeHolder(view: View) : RecyclerView.ViewHolder(view),
@@ -95,8 +111,7 @@ class CrimeListFragment : Fragment() {
         }
     }
 
-    private fun updateUI() {
-        val crimes = crimeListViewModel.crimes
+    private fun updateUI(crimes: List<Crime>) {
         adapter = CrimeAdapter(crimes)
         rvCrime.adapter = adapter
     }
