@@ -12,13 +12,14 @@ import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
 import com.android.criminalintent.model.Crime
 import com.android.criminalintent.utils.Constants
-import com.android.criminalintent.utils.Utils
 import com.android.criminalintent.viewmodel.CrimeDetailViewModel
+import java.sql.Date
 import java.util.*
 
-class CrimeFragment : Fragment() {
+class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
     companion object {
         private const val TAG = "CrimeFragment"
 
@@ -45,7 +46,7 @@ class CrimeFragment : Fragment() {
         super.onCreate(savedInstanceState)
         Log.i(TAG, "onCreate")
         crime = Crime()
-        val crimeId:UUID = arguments?.getSerializable(Constants.ARG_CRIME_ID) as UUID
+        val crimeId: UUID = arguments?.getSerializable(Constants.ARG_CRIME_ID) as UUID
         Log.d(TAG, "args bundle crime ID: $crimeId")
         crimeDetailViewModel.loadCrime(crimeId)
     }
@@ -61,10 +62,6 @@ class CrimeFragment : Fragment() {
         btnDate = view.findViewById(R.id.crime_date)
         cbCrimeSolved = view.findViewById(R.id.cb_crime_solved)
 
-        btnDate.apply {
-            text = Utils.formatDate(crime.date)
-            isEnabled = false
-        }
         return view
     }
 
@@ -84,7 +81,10 @@ class CrimeFragment : Fragment() {
     private fun updateUI() {
         etCrimeTitle.setText(crime.title)
         btnDate.text = crime.date.toString()
-        cbCrimeSolved.isChecked = crime.isSolved
+        cbCrimeSolved.apply {
+            isChecked = crime.isSolved
+            jumpDrawablesToCurrentState() // this eliminates the checkbox animation after opening the crime detail fragment
+        }
     }
 
     override fun onStart() {
@@ -120,5 +120,24 @@ class CrimeFragment : Fragment() {
                 crime.isSolved = isChecked
             }
         }
+
+        btnDate.setOnClickListener {
+            DatePickerFragment.newInstance(crime.date).apply {
+                setTargetFragment(this@CrimeFragment, Constants.REQUEST_DATE)
+                show(this@CrimeFragment.requireFragmentManager(), Constants.DIALOG_DATE)
+            }
+        }
+    }
+
+    // onStop() is called when fragments moves entirely out of view
+    override fun onStop() {
+        super.onStop()
+        // Once user leaves the crime detail fragment, the crime details edited by the user are saved back to database
+        crimeDetailViewModel.saveCrime(crime)
+    }
+
+    override fun onDateSelected(date: java.util.Date) {
+        crime.date = date
+        updateUI()
     }
 }

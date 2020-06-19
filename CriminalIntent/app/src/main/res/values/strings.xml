@@ -7,4 +7,5 @@
     <string name="tv_crime_title">Crime Title</string>
     <string name="tv_crime_data">Crime Data</string>
     <string name="btn_contact_police">Contact Police</string>
+    <string name="new_crime">New Crime</string>
 </resources>

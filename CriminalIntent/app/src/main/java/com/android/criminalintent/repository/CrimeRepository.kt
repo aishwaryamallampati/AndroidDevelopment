@@ -8,6 +8,7 @@ import com.android.criminalintent.model.Crime
 import com.android.criminalintent.utils.Constants
 import java.lang.IllegalStateException
 import java.util.*
+import java.util.concurrent.Executors
 
 /**
  * UI asks repository to provide the data.
@@ -35,7 +36,23 @@ class CrimeRepository private constructor(context: Context) {
 
     private val crimeDao = database.crimeDao()
 
+    // newSingleThreadExecutor function returns an executor instance that points to a new thread
+    // Any work executed with the executor will therefore happen off the main thread
+    private val executor = Executors.newSingleThreadExecutor()
+
     fun getCrimes(): LiveData<List<Crime>> = crimeDao.getCrimes()
 
     fun getCrime(id: UUID): LiveData<Crime?> = crimeDao.getCrime(id)
+
+    fun updateCrime(crime: Crime) {
+        executor.execute {
+            crimeDao.updateCrime(crime)
+        }
+    }
+
+    fun addCrime(crime: Crime) {
+        executor.execute {
+            crimeDao.addCrime(crime)
+        }
+    }
 }
