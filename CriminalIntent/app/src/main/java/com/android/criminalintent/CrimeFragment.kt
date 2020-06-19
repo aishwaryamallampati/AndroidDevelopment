@@ -11,12 +11,25 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import com.android.criminalintent.model.Crime
+import com.android.criminalintent.utils.Constants
 import com.android.criminalintent.utils.Utils
+import com.android.criminalintent.viewmodel.CrimeDetailViewModel
+import java.util.*
 
 class CrimeFragment : Fragment() {
     companion object {
         private const val TAG = "CrimeFragment"
+
+        fun newInstance(crimeId: UUID): CrimeFragment {
+            val args = Bundle().apply {
+                putSerializable(Constants.ARG_CRIME_ID, crimeId)
+            }
+            return CrimeFragment().apply {
+                arguments = args
+            }
+        }
     }
 
     private lateinit var crime: Crime
@@ -24,10 +37,17 @@ class CrimeFragment : Fragment() {
     private lateinit var btnDate: Button
     private lateinit var cbCrimeSolved: CheckBox
 
+    private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
+        ViewModelProviders.of(this).get(CrimeDetailViewModel::class.java)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i(TAG, "onCreate")
         crime = Crime()
+        val crimeId:UUID = arguments?.getSerializable(Constants.ARG_CRIME_ID) as UUID
+        Log.d(TAG, "args bundle crime ID: $crimeId")
+        crimeDetailViewModel.loadCrime(crimeId)
     }
 
     override fun onCreateView(
@@ -46,6 +66,25 @@ class CrimeFragment : Fragment() {
             isEnabled = false
         }
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        crimeDetailViewModel.crimeLiveData.observe(
+            viewLifecycleOwner,
+            Observer { crime ->
+                crime?.let {
+                    this.crime = crime
+                    updateUI()
+                }
+            }
+        )
+    }
+
+    private fun updateUI() {
+        etCrimeTitle.setText(crime.title)
+        btnDate.text = crime.date.toString()
+        cbCrimeSolved.isChecked = crime.isSolved
     }
 
     override fun onStart() {
