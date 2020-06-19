@@ -13,5 +13,6 @@ data class Crime(
     @TypeConverters(CrimeTypeConverters::class)
     var date: Date = Date(),
     var isSolved: Boolean = false,
-    var requiresPolice: Boolean = false
+    var requiresPolice: Boolean = false,
+    var suspect: String = ""
 )

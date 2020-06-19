@@ -7,5 +7,7 @@ class Constants {
         const val DIALOG_DATE = "DialogDate"
         const val ARG_DATE = "date"
         const val REQUEST_DATE = 0
+        const val DATE_FORMAT = "EEE, MMM, dd"
+        const val REQUEST_CONTACT = 1
     }
 }

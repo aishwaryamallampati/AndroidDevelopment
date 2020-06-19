@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.android.criminalintent.database.CrimeDatabase
+import com.android.criminalintent.database.migration_1_2
 import com.android.criminalintent.model.Crime
 import com.android.criminalintent.utils.Constants
 import java.lang.IllegalStateException
@@ -31,8 +32,11 @@ class CrimeRepository private constructor(context: Context) {
     }
 
     private val database: CrimeDatabase = Room.databaseBuilder(
-        context.applicationContext, CrimeDatabase::class.java, Constants.DATABASE_NAME
-    ).build()
+        context.applicationContext,
+        CrimeDatabase::class.java,
+        Constants.DATABASE_NAME
+    ).addMigrations(migration_1_2)
+        .build()
 
     private val crimeDao = database.crimeDao()
 
