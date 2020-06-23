@@ -2,4 +2,5 @@
 <resources>
     <dimen name="layout_margin">16dp</dimen>
     <dimen name="list_item_padding">8dp</dimen>
+    <dimen name="crime_photo_dimens">80dp</dimen>
 </resources>

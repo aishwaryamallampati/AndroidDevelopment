@@ -9,5 +9,6 @@ class Constants {
         const val REQUEST_DATE = 0
         const val DATE_FORMAT = "EEE, MMM, dd"
         const val REQUEST_CONTACT = 1
+        const val REQUEST_PHOTO = 2
     }
 }

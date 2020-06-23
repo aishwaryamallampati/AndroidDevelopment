@@ -4,24 +4,27 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
+import android.widget.*
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.Observer
 import com.android.criminalintent.model.Crime
 import com.android.criminalintent.utils.Constants
+import com.android.criminalintent.utils.getScaledBitmap
 import com.android.criminalintent.viewmodel.CrimeDetailViewModel
+import java.io.File
 import java.util.*
 
 class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
@@ -44,6 +47,10 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
     private lateinit var cbCrimeSolved: CheckBox
     private lateinit var btnChooseSuspect: Button
     private lateinit var btnSendReport: Button
+    private lateinit var ivCrimePhoto: ImageView
+    private lateinit var ibCrimeCamera: ImageButton
+    private lateinit var photoFile: File
+    private lateinit var photoUri: Uri
 
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProviders.of(this).get(CrimeDetailViewModel::class.java)
@@ -70,6 +77,8 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         cbCrimeSolved = view.findViewById(R.id.cb_crime_solved)
         btnChooseSuspect = view.findViewById(R.id.btn_choose_suspect)
         btnSendReport = view.findViewById(R.id.btn_send_crime_report)
+        ivCrimePhoto = view.findViewById(R.id.iv_crime_photo) as ImageView
+        ibCrimeCamera = view.findViewById(R.id.ib_crime_camera) as ImageButton
         return view
     }
 
@@ -80,6 +89,13 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
             Observer { crime ->
                 crime?.let {
                     this.crime = crime
+                    photoFile = crimeDetailViewModel.getPhotoFile(crime)
+                    // FileProvidre.getUriForFile() converts local file path into a Uri so that the camera app can see.
+                    photoUri = FileProvider.getUriForFile(
+                        requireActivity(),
+                        "com.android.criminalintent.fileprovider",
+                        photoFile
+                    )
                     updateUI()
                 }
             }
@@ -95,6 +111,16 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         }
         if (crime.suspect.isNotEmpty()) {
             btnChooseSuspect.text = crime.suspect
+        }
+        updatePhotoView()
+    }
+
+    private fun updatePhotoView() {
+        if (photoFile.exists()) {
+            val bitmap = getScaledBitmap(photoFile.path, requireActivity())
+            ivCrimePhoto.setImageBitmap(bitmap)
+        } else {
+            ivCrimePhoto.setImageDrawable(null)
         }
     }
 
@@ -168,6 +194,34 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
                 isEnabled = false
             }
         }
+
+        ibCrimeCamera.apply {
+            // enable this button only if the device has camera and a location to save the photo
+            val packageManager: PackageManager = requireActivity().packageManager
+            val captureImage = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            val resolvedActivity: ResolveInfo? =
+                packageManager.resolveActivity(captureImage, PackageManager.MATCH_DEFAULT_ONLY)
+            if (resolvedActivity == null) {
+                isEnabled = false
+            }
+
+            setOnClickListener {
+                captureImage.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                val cameraActivities: List<ResolveInfo> = packageManager.queryIntentActivities(
+                    captureImage,
+                    PackageManager.MATCH_DEFAULT_ONLY
+                )
+                for (cameraActivity in cameraActivities) {
+                    // Grant permission to camera app to store the photo taken in apps private storage
+                    requireActivity().grantUriPermission(
+                        cameraActivity.activityInfo.packageName,
+                        photoUri,
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                }
+                startActivityForResult(captureImage, Constants.REQUEST_PHOTO)
+            }
+        }
     }
 
     // onStop() is called when fragments moves entirely out of view
@@ -175,6 +229,12 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         super.onStop()
         // Once user leaves the crime detail fragment, the crime details edited by the user are saved back to database
         crimeDetailViewModel.saveCrime(crime)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        // Revoke permission given to camera app
+        requireActivity().revokeUriPermission(photoUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
     }
 
     override fun onDateSelected(date: java.util.Date) {
@@ -203,6 +263,14 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
                     crime.suspect = suspect
                     crimeDetailViewModel.saveCrime(crime)
                 }
+            }
+            requestCode == Constants.REQUEST_PHOTO -> {
+                // once the photo is saved by the camera app in the specified private location => then revoke the permission and updat ui
+                requireActivity().revokeUriPermission(
+                    photoUri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                updatePhotoView()
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
