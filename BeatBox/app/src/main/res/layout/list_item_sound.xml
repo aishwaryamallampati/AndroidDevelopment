@@ -11,11 +11,13 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/item_sound_margin">
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/item_sound_height"
+            android:layout_width="@dimen/item_sound_size"
+            android:layout_height="@dimen/item_sound_size"
+            android:layout_gravity="center"
             android:onClick="@{()->viewModel.onButtonClicked()}"
             android:text="@{viewModel.title}"
             tools:text="Sound name" />

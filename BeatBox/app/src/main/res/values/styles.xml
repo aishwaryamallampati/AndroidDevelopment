@@ -10,7 +10,7 @@
     </style>
 
     <style name="BeatBoxButton" parent="Widget.AppCompat.Button">
-        <item name="android:background">@color/dark_blue</item>
+        <item name="android:background">@drawable/btn_beatbox</item>
     </style>
 
 </resources>

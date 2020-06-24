@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="item_sound_height">120dp</dimen>
+    <dimen name="item_sound_size">100dp</dimen>
+    <dimen name="item_sound_margin">8dp</dimen>
+    <dimen name="item_sound_border">4dp</dimen>
 </resources>
