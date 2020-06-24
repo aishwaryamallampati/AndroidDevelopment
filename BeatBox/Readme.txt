@@ -1,5 +1,4 @@
 Details of BeatBox Android Application:
-- A list of crimes recorded will be displayed to the user
 - User can play sounds by clicking on the buttons
 - User can play at max 5 sounds at a time.
 
