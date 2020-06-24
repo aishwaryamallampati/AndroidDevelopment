@@ -30,7 +30,7 @@ class BeatBox(private val assets: AssetManager) {
             return emptyList()
         }
         val sounds = mutableListOf<Sound>()
-        soundNames.forEach{filename->
+        soundNames.forEach { filename ->
             val assetPath = "$SOUNDS_FOLDER/$filename"
             val sound = Sound(assetPath)
             sounds.add(sound)
