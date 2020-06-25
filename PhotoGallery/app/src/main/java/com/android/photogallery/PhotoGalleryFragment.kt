@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.photogallery.model.GalleryItem
 import com.android.photogallery.repository.FlickrFetchr
+import com.android.photogallery.viewmodel.PhotoGalleryViewModel
 
 class PhotoGalleryFragment : Fragment() {
     companion object {
@@ -19,18 +21,13 @@ class PhotoGalleryFragment : Fragment() {
         fun newInstance() = PhotoGalleryFragment()
     }
 
+    private lateinit var photoGalleryViewModel: PhotoGalleryViewModel
     private lateinit var rvPhoto: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
-        val flickrLiveData: LiveData<List<GalleryItem>> = FlickrFetchr().fetchPhotos()
-        flickrLiveData.observe(
-            this,
-            Observer { galleryItems ->
-                Log.d(TAG, "Response recerived: $galleryItems")
-            }
-        )
+        photoGalleryViewModel = ViewModelProviders.of(this).get(PhotoGalleryViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -43,6 +40,17 @@ class PhotoGalleryFragment : Fragment() {
         rvPhoto = view.findViewById(R.id.rv_photo)
         rvPhoto.layoutManager = GridLayoutManager(context, 3)
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        photoGalleryViewModel.galleryItemLiveData.observe(
+            viewLifecycleOwner,
+            Observer { galleryItems ->
+                Log.i(TAG, "Have gallery items from ViewModel $galleryItems")
+
+            }
+        )
     }
 
 }
