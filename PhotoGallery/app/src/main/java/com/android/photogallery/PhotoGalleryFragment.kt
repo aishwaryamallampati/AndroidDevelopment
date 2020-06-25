@@ -5,10 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.photogallery.model.GalleryItem
@@ -48,9 +50,31 @@ class PhotoGalleryFragment : Fragment() {
             viewLifecycleOwner,
             Observer { galleryItems ->
                 Log.i(TAG, "Have gallery items from ViewModel $galleryItems")
-
+                rvPhoto.adapter = PhotoAdapter(galleryItems)
             }
         )
+    }
+
+    private class PhotoHolder(tvItem: TextView) : RecyclerView.ViewHolder(tvItem) {
+        val bindTitle: (CharSequence) -> Unit = tvItem::setText
+    }
+
+    private class PhotoAdapter(private val galleryItems: List<GalleryItem>) :
+        RecyclerView.Adapter<PhotoHolder>() {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): PhotoHolder {
+            val textView = TextView(parent.context)
+            return PhotoHolder(textView)
+        }
+
+        override fun getItemCount(): Int = galleryItems.size
+
+        override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
+            val galleryItem = galleryItems[position]
+            holder.bindTitle(galleryItem.title)
+        }
     }
 
 }
