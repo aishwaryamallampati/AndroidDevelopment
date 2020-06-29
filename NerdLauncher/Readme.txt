@@ -8,3 +8,5 @@ Technical Details
 - Implicit intent is used to retrieve the list of launchable apps
 - Explicit intent is used to launch a particular app selected by the user
 - Each application is launched in a new task
+
+Demo Video: https://www.youtube.com/watch?v=QQ5vIfxHW1I

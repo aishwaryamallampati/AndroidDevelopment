@@ -16,3 +16,5 @@ Technical Details
 - Room database is used to store the crime record
 - Photos taken by the camera for the crime are stored in the application's private storage directory.
 - Live data is used to update UI 
+
+Demo Video: https://www.youtube.com/watch?v=hkfLWwI8iAM

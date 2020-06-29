@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="@dimen/layout_margin"
+    android:background="@color/seablue"
     android:orientation="vertical">
 
     <ImageView
@@ -32,6 +33,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/crime_title_label"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="@id/iv_crime_photo"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,6 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/crime_title_hint"
+        android:textColor="@android:color/white"
         app:layout_constraintLeft_toRightOf="@id/iv_crime_photo"
         app:layout_constraintTop_toBottomOf="@id/tv_crime_title_label" />
 
@@ -49,14 +55,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/crime_details_label"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ib_crime_camera" />
 
     <Button
         android:id="@+id/crime_date"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/layout_margin"
+        android:background="@android:color/white"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_crime_details_label"
         tools:text="Wed June 16 15:16 EST 2020"></Button>
 
@@ -64,23 +76,31 @@
         android:id="@+id/cb_crime_solved"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/layout_margin"
         android:text="@string/crime_solved_label"
+        android:textColor="@android:color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/crime_date" />
 
     <Button
         android:id="@+id/btn_choose_suspect"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/layout_margin"
+        android:background="@android:color/white"
         android:text="@string/btn_choose_suspect"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cb_crime_solved" />
 
     <Button
         android:id="@+id/btn_send_crime_report"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/layout_margin"
+        android:background="@android:color/white"
         android:text="@string/btn_send_crime_report"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_choose_suspect" />
 </androidx.constraintlayout.widget.ConstraintLayout>

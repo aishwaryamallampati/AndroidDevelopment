@@ -10,3 +10,5 @@ Details of GeoQuiz Android Application:
 
 Programming Language: Kotlin
 Architecture: MVC
+
+Demo Video: https://www.youtube.com/watch?v=u7KNXjmOCLU
