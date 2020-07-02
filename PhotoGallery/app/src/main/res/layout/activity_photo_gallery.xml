@@ -4,4 +4,5 @@
     android:id="@+id/fl_fragmentContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/seablue"
     tools:context=".PhotoGalleryActivity" />
