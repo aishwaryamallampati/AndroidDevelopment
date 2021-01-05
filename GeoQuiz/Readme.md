@@ -8,8 +8,8 @@ Details of GeoQuiz Android Application:
 - Next question can also be displayed by tapping on the question text
 - Quiz Score will be displayed to the user after answering all the questions.
 
-Programming Language: Kotlin
-Architecture: MVC
+- Programming Language: Kotlin
+- Architecture: MVC
 
 Demo Video: 
 
