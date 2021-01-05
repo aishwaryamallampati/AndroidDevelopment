@@ -1,4 +1,4 @@
-Details of CriminalIntent Android Application:
+## Details of CriminalIntent Android Application:
 - A list of crimes recorded will be displayed to the user
 - User can create new crime record using the + plus button in the action bar.
 - For each crime record, user can enter the following details:
@@ -10,11 +10,15 @@ Details of CriminalIntent Android Application:
 	- User can mark the crime as solved once it is closed.
 - The application supports two languages: English and Spanish
 
-Technical Details
+## Technical Details
 - Programming Language: Kotlin
 - Architecture: MVC
 - Room database is used to store the crime record
 - Photos taken by the camera for the crime are stored in the application's private storage directory.
 - Live data is used to update UI 
 
-Demo Video: https://www.youtube.com/watch?v=hkfLWwI8iAM
+Demo Video: 
+
+<img src="walkthrough.gif" width=250><br>
+
+GIF created with [LiceCap](http://www.cockos.com/licecap/).
